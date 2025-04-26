@@ -1,44 +1,43 @@
 import google.generativeai as genai
 
-# --- Configuration ---
-API_KEY = "AIzaSyBIVkeXW7JpZzQxJZY72ZlO0lHxFYEpuMk" # <<< --- Still using the exposed key
-SYSTEM_INSTRUCTION = "คุณเป็นสุดยอดเกษตรกรที่มีความสามารถมากในการปลูกพืชผักสวนครัว โปรดให้คำแนะนำฉันเป็นภาษาไทย"
-GENERATION_CONFIG =  {"temperature": 0.7}
+# --- กำหนดค่าคอนฟิกที่จำเป็นสำหรับการใช้งานไลบรารี ---
+API_KEY = "คีย์ที่ได้จาก google ai studio"  # กำหนด API Key สำหรับเชื่อมต่อกับบริการ Google Generative AI
+SYSTEM_INSTRUCTION = "คุณเป็นสุดยอดเกษตรกรที่มีความสามารถมากในการปลูกพืชผักสวนครัว โปรดให้คำแนะนำฉันเป็นภาษาไทย"  # กำหนดบทบาทของโมเดลให้ตอบในฐานะเกษตรกรผู้เชี่ยวชาญ
+GENERATION_CONFIG =  {"temperature": 0.7}  # กำหนดค่าการสุ่มของการสร้างข้อความ (ยิ่งค่าสูง ยิ่งสร้างสรรค์)
 
-# Configure the library with the API key
+# ตั้งค่าไลบรารีด้วย API Key ที่กำหนดไว้ เพื่อให้สามารถเรียกใช้งานโมเดลได้
 genai.configure(api_key=API_KEY)
 
-# --- Model Initialization with System Instruction ---
-# Select the model and apply the system instruction
+# --- เริ่มต้นใช้โมเดลพร้อมกำหนดบทบาทและค่าการสร้างข้อความ ---
+# สร้างอ็อบเจกต์โมเดลด้วยชื่อโมเดล, คำสั่งระบบ และค่าคอนฟิกการสร้างข้อความ
 model = genai.GenerativeModel(
-    model_name='gemini-1.5-flash',
-    system_instruction=SYSTEM_INSTRUCTION,
-    generation_config=GENERATION_CONFIG
+    model_name='gemini-1.5-flash',  # เลือกใช้โมเดล Gemini รุ่น 1.5 Flash
+    system_instruction=SYSTEM_INSTRUCTION,  # ส่งคำสั่งระบบเพื่อกำหนดบทบาทการตอบ
+    generation_config=GENERATION_CONFIG  # ส่งค่าคอนฟิกสำหรับการสร้างข้อความ
 )
 
-# Start a chat session (history is maintained automatically)
+# เริ่มต้นเซสชันแชทใหม่ โดย history=[] หมายถึงยังไม่มีประวัติการสนทนา
 chat = model.start_chat(history=[])
 
-print(f"Chatting with Gemini (Role: {SYSTEM_INSTRUCTION})")
-print("Type 'quit' to exit...")
-print("-" * 20) # Separator for clarity
+# แสดงข้อความแจ้งผู้ใช้เกี่ยวกับบทบาทของโมเดลและวิธีการออกจากโปรแกรม
+print(f"กำลังสนทนากับ Gemini (บทบาท: {SYSTEM_INSTRUCTION})")
+print("พิมพ์ 'quit' เพื่อออกจากโปรแกรม...")
+print("-" * 20)  # แสดงเส้นแบ่งเพื่อความชัดเจน
 
-# Simple chat loop
-while (prompt := input("You: ").strip().lower()) != 'quit': # Convert to lowercase for quit command
-    if not prompt: # Skip empty input
+# วนลูปรับข้อความจากผู้ใช้ทีละบรรทัด และส่งไปที่โมเดลเพื่อรับคำตอบ
+while (prompt := input("คุณ: ").strip().lower()) != 'quit':  # รับข้อความจากผู้ใช้และแปลงเป็นตัวพิมพ์เล็กเพื่อตรวจสอบคำว่า 'quit'
+    if not prompt:  # ถ้าผู้ใช้กด Enter โดยไม่พิมพ์ข้อความ จะข้ามไปยังรอบถัดไป
         continue
     try:
-        # Send the user's message to the chat session
+        # ส่งข้อความของผู้ใช้ไปยังโมเดลเพื่อให้โมเดลตอบกลับ
         response = chat.send_message(prompt)
-        # Print the model's response text
+        # แสดงผลคำตอบที่ได้รับจากโมเดล Gemini
         print(f"Gemini: {response.text}")
     except Exception as chat_error:
-        # Handle potential errors during message sending (e.g., network issues, content filtering)
-        print(f"\nError sending message: {chat_error}")
-        print("Please try again.")
-    print("-" * 20) # Separator for clarity
+        # กรณีเกิดข้อผิดพลาดระหว่างการส่งข้อความ (เช่น อินเทอร์เน็ตขัดข้อง หรือเนื้อหาถูกบล็อก)
+        print(f"\nเกิดข้อผิดพลาดขณะส่งข้อความ: {chat_error}")
+        print("กรุณาลองใหม่อีกครั้ง.")
+    print("-" * 20)  # แสดงเส้นแบ่งเพื่อความชัดเจนหลังจบแต่ละรอบ
 
-print("\nChat ended.")
-
-
-
+# เมื่อผู้ใช้พิมพ์ 'quit' โปรแกรมจะออกจากลูปและแสดงข้อความจบการสนทนา
+print("\nจบการสนทนาแล้ว.")
