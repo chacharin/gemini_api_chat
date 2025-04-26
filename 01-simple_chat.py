@@ -1,26 +1,27 @@
-# Import the necessary library
+# นำเข้าไลบรารีที่จำเป็นสำหรับใช้งาน Google Generative AI
 import google.generativeai as genai
 
-# --- Configuration ---
-# WARNING: Hardcoding API keys is insecure. Revoke this key.
-API_KEY = "AIzaSyBIVkeXW7JpZzQxJZY72ZlO0lHxFYEpuMk"
+# --- การตั้งค่าคอนฟิกเริ่มต้น ---
+API_KEY = "....."  # กำหนดคีย์ API ที่ใช้สำหรับยืนยันตัวตนกับบริการของ Google
 
-
-# Configure the library with the API key
+# ตั้งค่าการใช้งานไลบรารีด้วย API Key ที่กำหนดไว้
 genai.configure(api_key=API_KEY)
 
-# Select the model (gemini-1.5-flash is often in the free tier)
+# เลือกโมเดลที่ต้องการใช้งาน โดย 'gemini-1.5-flash' มักจะสามารถใช้ได้ฟรี
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# Start a chat session
+# เริ่มต้นสร้างเซสชันแชทใหม่ โดย history=[] หมายถึงไม่มีประวัติการสนทนาก่อนหน้า
 chat = model.start_chat(history=[])
 
-print("Chatting with Gemini (type 'quit' to exit)...")
+# แสดงข้อความแจ้งเตือนผู้ใช้ว่าเริ่มต้นใช้งานแชทกับ Gemini แล้ว หากต้องการออกให้พิมพ์ 'quit'
+print("กำลังสนทนากับ Gemini (พิมพ์ 'quit' เพื่อออกจากโปรแกรม)...")
 
-# Simple chat loop
-while (prompt := input("You: ").strip()) != 'quit':
+# วนลูปรับข้อความจากผู้ใช้ทีละบรรทัด และส่งไปที่โมเดลเพื่อรับคำตอบ
+while (prompt := input("คุณ: ").strip()) != 'quit':
+    # ส่งข้อความที่ผู้ใช้ป้อนให้โมเดลประมวลผลและตอบกลับ
     response = chat.send_message(prompt)
+    # แสดงผลคำตอบที่ได้รับจากโมเดล Gemini
     print(f"Gemini: {response.text}")
 
-print("Chat ended.")
-
+# เมื่อผู้ใช้พิมพ์ 'quit' โปรแกรมจะออกจากลูปและแสดงข้อความสิ้นสุดการสนทนา
+print("จบการสนทนาแล้ว.")
